@@ -1,12 +1,21 @@
 import mmap
-from ..globals.globalconst import GlobalConst
+from ..globals import *
+import os
 
-class Storage(GlobalConst):
+class Storage():
     
     def __init__(self, filename='storage.toydb'):
         super().__init__()
-        self.f = open(filename, "a+b")
-        self.mm = mmap.mmap(f.fileno(), 0)
+
+        # mmap an empty file throws error
+        if os.path.exists(filename):
+            self.f = open(filename, "a+b")
+        else:
+            self.f = open(filename, "a+b")
+            self.f.write(bytearray(PAGESIZE)) # TODO replace w/ database header
+            self.f.flush()
+
+        self.disk = mmap.mmap(self.f.fileno(), 0)
 
     def __enter__(self):
         return self
@@ -15,6 +24,22 @@ class Storage(GlobalConst):
         self.close()
 
     def close(self):
-        self.mm.close()
+        self.disk.close()
         self.f.close()
+
+    def pagenoToByteAddr(self, pageno):
+        start = pageno * PAGESIZE
+        return (start, start + PAGESIZE)
         
+    def readPage(self, pageno):
+        start, stop = self.pagenoToByteAddr(pageno)
+        return self.disk[start:stop]
+
+    def writePage(self, pageno, data):
+        start, stop = self.pagenoToByteAddr(pageno)
+        self.disk[start:stop] = data
+        #self.disk.flush()
+
+    def setSize(self, notables):
+        self.disk.resize(PAGESIZE + PAGESIZE * TABLESIZE * notables)
+        #self.disk.flush()

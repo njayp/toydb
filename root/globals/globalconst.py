@@ -1,5 +1,3 @@
-class GlobalConst():
-
-    def __init__(self):
-        self.pagesize = 1024
+PAGESIZE = 1024 # bytes
+TABLESIZE = 100 # pages
         

@@ -1,11 +1,11 @@
-from ..globals.globalconst import GlobalConst
+from ..globals import *
 
 class header():
 
     def __init__(self):
         super().__init__()
 
-class BasePage(GlobalConst):
+class BasePage():
 
     def __init__(self):
         super().__init__()

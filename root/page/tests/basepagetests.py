@@ -1,13 +1,14 @@
 from .. import basepage
+from ...globals import *
 import unittest
 
 class BasePageTests(unittest.TestCase):
     def setUp(self):
         self.page = basepage.BasePage()
-
+'''
     def test_pagesize(self):
-        self.assertEqual(1024, self.page.pagesize)
-
+        self.assertEqual(1024, PAGESIZE)
+'''
 
 '''
     def test_upper(self):
