@@ -1,9 +1,10 @@
 import mmap
 from ..globals import *
 import os
-class Storage():
+
+class Disk():
     
-    def __init__(self, filename='storage.toydb'):
+    def __init__(self, filename='disk.toydb'):
         super().__init__()
 
         # mmap an empty file throws error
@@ -26,7 +27,7 @@ class Storage():
         self.disk.close()
         self.f.close()
 
-    def pagenoToByteAddr(self, pageno:int):
+    def pagenoToByteAddr(self, pageno: int):
         start = pageno * PAGESIZE
         return (start, start + PAGESIZE)
         

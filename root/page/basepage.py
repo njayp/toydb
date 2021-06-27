@@ -1,55 +1,34 @@
 from ..globals import *
 import json
 
-'''
-class Header():
+PAGETYPESIZE = 1 # bytes
 
-    def __init__(self, headerbytes):
-        super().__init__()
-        self.headerbytes = headerbytes
+PAGENOSIZE = 3
+PAGENOSTART = PAGETYPESIZE
+PAGENOEND = PAGETYPESIZE + PAGENOSIZE
 
-    def __init__(self, pagetype, pageno):
-        super().__init__()
-        self.headerbytes = bytearray([pagetype, pageno])
-
-    def getPageType(self):
-        return self.headerbytes[:1]
-
-    def getPageNo(self):
-        return self.headerbytes[1:2]
-
-    def printSelf(self):
-        print(self.headerbytes)
-'''
-
-PAGETYPESIZE = 1 # byte
-PAGENOSIZE = 3 # bytes
-
+HEADERSIZE = PAGENOEND
 
 class BasePage():
 
-    def __init__(self, rawbytes: bytearray):
-        super().__init__()
-        self.rawbytes = rawbytes
-
-    def __init__(self, pagetype: int, pageno: int):
+    def __init__(self, pagetype: int=0, pageno: int=0):
         super().__init__()
         self.rawbytes = bytearray(PAGESIZE)
         self.rawbytes[:PAGETYPESIZE] = pagetype.to_bytes(PAGETYPESIZE, 'big')
-        self.rawbytes[PAGETYPESIZE:PAGETYPESIZE + PAGENOSIZE] = pageno.to_bytes(PAGENOSIZE, 'big')
+        self.rawbytes[PAGETYPESIZE:PAGENOEND] = pageno.to_bytes(PAGENOSIZE, 'big')
 
+    def loadBytes(self, rawbytes):
+        self.rawbytes = rawbytes
+        return self
 
     def getPageType(self):
         return int.from_bytes(self.rawbytes[:PAGETYPESIZE], 'big')
 
     def getPageNo(self):
-        return int.from_bytes(self.rawbytes[PAGETYPESIZE:PAGETYPESIZE + PAGENOSIZE], 'big')
+        return int.from_bytes(self.rawbytes[PAGETYPESIZE:PAGENOEND], 'big')
 
     def getRecords(self):
         return self.rawbytes[HEADERSIZE:]
-
-    def addRecord(self, record):
-        self.recordbytes.append(record)
 
     def getBytes(self):
         return self.rawbytes

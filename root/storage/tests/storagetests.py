@@ -1,4 +1,4 @@
-from ..storage import Storage
+from ..disk import Disk
 from ...globals import *
 import unittest
 import os
@@ -6,7 +6,7 @@ import os
 class StorageTests(unittest.TestCase):
     def setUp(self):
         self.filename = 'storagetest.toydb'
-        self.disk = Storage(self.filename)
+        self.disk = Disk(self.filename)
         self.ba = PAGESIZE*b'\1'
 
     def tearDown(self):
@@ -20,7 +20,7 @@ class StorageTests(unittest.TestCase):
     def test_closeopen(self):
         self.disk.writePage(0, self.ba)
         self.disk.close()
-        self.disk = Storage(self.filename)
+        self.disk = Disk(self.filename)
         self.assertEqual(self.ba, self.disk.readPage(0))
 
     def test_setSize(self):

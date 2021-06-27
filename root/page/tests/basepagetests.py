@@ -6,13 +6,15 @@ class BasePageTests(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_pagesize(self):
-        page = BasePage(4, 6)
-        self.assertEqual(4, page.getPageType())
-        self.assertEqual(6, page.getPageNo())
+    def test_pagecreation(self):
         page = BasePage(2, 505)
         self.assertEqual(2, page.getPageType())
         self.assertEqual(505, page.getPageNo())
+        
+    def test_pageload(self):
+        page = BasePage().loadBytes(PAGESIZE*b'\1')
+        self.assertEqual(1, page.getPageType())
+        self.assertEqual(65793, page.getPageNo())
 
 
 '''
