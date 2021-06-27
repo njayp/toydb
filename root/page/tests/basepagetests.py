@@ -12,7 +12,7 @@ class BasePageTests(unittest.TestCase):
         self.assertEqual(505, page.getPageNo())
         
     def test_pageload(self):
-        page = BasePage().loadBytes(PAGESIZE*b'\1')
+        page = BasePage().setBytes(PAGESIZE*b'\1')
         self.assertEqual(1, page.getPageType())
         self.assertEqual(65793, page.getPageNo())
 

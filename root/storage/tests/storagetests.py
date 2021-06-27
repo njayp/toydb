@@ -24,9 +24,9 @@ class StorageTests(unittest.TestCase):
         self.assertEqual(self.ba, self.disk.readPage(0))
 
     def test_setSize(self):
-        self.disk.setSize(1)
-        self.disk.writePage(5, self.ba)
-        self.assertEqual(self.ba, self.disk.readPage(5))
+        self.disk.setSize(100)
+        self.disk.writePage(15, self.ba)
+        self.assertEqual(self.ba, self.disk.readPage(15))
 
     def test_pagenoToByteAddr(self):
         self.assertEqual((0, PAGESIZE), self.disk.pagenoToByteAddr(0))

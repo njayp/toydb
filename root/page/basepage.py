@@ -17,7 +17,7 @@ class BasePage():
         self.rawbytes[:PAGETYPESIZE] = pagetype.to_bytes(PAGETYPESIZE, 'big')
         self.rawbytes[PAGETYPESIZE:PAGENOEND] = pageno.to_bytes(PAGENOSIZE, 'big')
 
-    def loadBytes(self, rawbytes):
+    def setBytes(self, rawbytes):
         self.rawbytes = rawbytes
         return self
 

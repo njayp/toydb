@@ -12,7 +12,7 @@ class Disk():
             self.f = open(filename, "r+b")
         else:
             self.f = open(filename, "a+b")
-            self.f.write(bytearray(PAGESIZE)) # TODO replace w/ database header
+            self.f.write(bytearray(PAGESIZE*10)) # TODO replace w/ database header
             self.f.flush()
 
         self.disk = mmap.mmap(self.f.fileno(), 0)
@@ -40,6 +40,6 @@ class Disk():
         self.disk[start:stop] = data
         #self.disk.flush()
 
-    def setSize(self, notables):
-        self.disk.resize(PAGESIZE + PAGESIZE * TABLESIZE * notables)
+    def setSize(self, newnopages):
+        self.disk.resize(PAGESIZE * newnopages)
         #self.disk.flush()

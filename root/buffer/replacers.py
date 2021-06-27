@@ -1,12 +1,18 @@
 from ..globals import *
+from .framedata import FDA
 
-class SequencialReplacer():
+
+
+class SequencialReplacer(FDA):
 
     def __init__(self):
         super().__init__()
-        self.frames = range(BUFFERSIZE)
 
     def chooseEvicted(self):
-        chosen = self.frames.pop(0)
-        self.frames.append(chosen)
-        return chosen
+        # TODO replace with for-else that throws exception
+        while (chosen := self.fda.pop(0)).pinned:
+            self.fda.append(chosen)
+        
+        self.fda.append(chosen)
+        return chosen.frameno
+        
