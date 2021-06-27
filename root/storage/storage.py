@@ -1,7 +1,6 @@
 import mmap
 from ..globals import *
 import os
-
 class Storage():
     
     def __init__(self, filename='storage.toydb'):
@@ -9,7 +8,7 @@ class Storage():
 
         # mmap an empty file throws error
         if os.path.exists(filename):
-            self.f = open(filename, "a+b")
+            self.f = open(filename, "r+b")
         else:
             self.f = open(filename, "a+b")
             self.f.write(bytearray(PAGESIZE)) # TODO replace w/ database header
@@ -27,7 +26,7 @@ class Storage():
         self.disk.close()
         self.f.close()
 
-    def pagenoToByteAddr(self, pageno):
+    def pagenoToByteAddr(self, pageno:int):
         start = pageno * PAGESIZE
         return (start, start + PAGESIZE)
         

@@ -1,3 +1,3 @@
-from .globalconst import (PAGESIZE, TABLESIZE)
+from .globalconst import (PAGESIZE, TABLESIZE, HEADERSIZE, INTSIZE)
 
-__all__ = ['PAGESIZE', 'TABLESIZE']
+__all__ = ['PAGESIZE', 'TABLESIZE', 'HEADERSIZE', 'INTSIZE']
