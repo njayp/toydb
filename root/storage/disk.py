@@ -40,6 +40,6 @@ class Disk():
         self.disk[start:stop] = data
         #self.disk.flush()
 
-    def setSize(self, newnopages):
-        self.disk.resize(PAGESIZE * newnopages)
+    def setSize(self, nopages):
+        self.disk.resize(PAGESIZE * nopages)
         #self.disk.flush()

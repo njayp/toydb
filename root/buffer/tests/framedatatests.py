@@ -1,12 +1,12 @@
-from ..framedata import FDA
+from ..frame import FrameArray
+from ..replacers import SequencialReplacer
 from ...globals import *
 import unittest
 
 class FrameDataTests(unittest.TestCase):
     def setUp(self):
-        self.fda = FDA()
+        self.replacer = SequencialReplacer()
 
     def test_fdaPageReplacement(self):
-        self.fda.replaceFrameData(2, 5)
-        self.assertEqual(self.fda.findFrameNo(5), 2)
+        self.assertEqual(len(self.replacer.framearray), BUFFERSIZE)
         

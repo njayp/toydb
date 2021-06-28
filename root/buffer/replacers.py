@@ -1,18 +1,18 @@
 from ..globals import *
-from .framedata import FDA
+from .frame import (FrameArray, Frame)
 
 
 
-class SequencialReplacer(FDA):
+class SequencialReplacer(FrameArray):
 
     def __init__(self):
         super().__init__()
 
-    def chooseEvicted(self):
+    def replacer(self, rawbytes: bytearray, pageno: int, pinned: bool=False, dirty: bool=False):
         # TODO replace with for-else that throws exception
-        while (chosen := self.fda.pop(0)).pinned:
-            self.fda.append(chosen)
+        while (chosen := self.framearray.pop(0)).pinned:
+            self.framearray.append(chosen)
         
-        self.fda.append(chosen)
-        return chosen.frameno
+        self.framearray.append(Frame(rawbytes, pageno, pinned, dirty))
+        return chosen
         
