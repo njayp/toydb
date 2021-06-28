@@ -1,4 +1,3 @@
-from ..page.basepage import BasePage
 from ..globals import *
 
 class FrameArray():
@@ -22,12 +21,3 @@ class Frame():
         self.pinned = pinned
         self.pageno = pageno
         self.rawbytes = rawbytes
-
-    def setDirty(self, dirty: bool):
-        self.dirty = dirty
-
-    def setPinned(self, pinned: bool):
-        self.pinned = pinned
-
-    def setRawBytes(self, rawbytes: bytearray):
-        self.rawbytes = rawbytes   

@@ -31,11 +31,11 @@ class Disk():
         start = pageno * PAGESIZE
         return (start, start + PAGESIZE)
         
-    def readPage(self, pageno):
+    def readBytes(self, pageno):
         start, stop = self.pagenoToByteAddr(pageno)
         return self.disk[start:stop]
 
-    def writePage(self, pageno, data):
+    def writeBytes(self, pageno, data):
         start, stop = self.pagenoToByteAddr(pageno)
         self.disk[start:stop] = data
         #self.disk.flush()

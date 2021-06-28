@@ -1,20 +1,16 @@
 from ..basepage import BasePage
 from ...globals import *
+from ...buffer.frame import Frame
 import unittest
 
 class BasePageTests(unittest.TestCase):
     def setUp(self):
-        pass
+        self.page = BasePage(Frame(bytearray(PAGESIZE)))
 
     def test_pagecreation(self):
-        page = BasePage(2, 505)
-        self.assertEqual(2, page.getPageType())
-        self.assertEqual(505, page.getPageNo())
-        
-    def test_pageload(self):
-        page = BasePage().setBytes(PAGESIZE*b'\1')
-        self.assertEqual(1, page.getPageType())
-        self.assertEqual(65793, page.getPageNo())
+        self.assertEqual(0, self.page.getPageType())
+        self.assertEqual(0, page.getPageNo())
+    
 
 
 '''

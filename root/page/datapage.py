@@ -1,6 +1,6 @@
-import page
+from . import basepage
 
-class DataPage(page):
+class DataPage(basepage):
 
     def __init__(self):
         super().__init__()

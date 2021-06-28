@@ -14,19 +14,19 @@ class StorageTests(unittest.TestCase):
         os.remove(self.filename)
 
     def test_readwrite(self):
-        self.disk.writePage(0, self.ba)
-        self.assertEqual(self.ba, self.disk.readPage(0))
+        self.disk.writeBytes(0, self.ba)
+        self.assertEqual(self.ba, self.disk.readBytes(0))
 
     def test_closeopen(self):
-        self.disk.writePage(0, self.ba)
+        self.disk.writeBytes(0, self.ba)
         self.disk.close()
         self.disk = Disk(self.filename)
-        self.assertEqual(self.ba, self.disk.readPage(0))
+        self.assertEqual(self.ba, self.disk.readBytes(0))
 
     def test_setSize(self):
         self.disk.setSize(100)
-        self.disk.writePage(15, self.ba)
-        self.assertEqual(self.ba, self.disk.readPage(15))
+        self.disk.writeBytes(15, self.ba)
+        self.assertEqual(self.ba, self.disk.readBytes(15))
 
     def test_pagenoToByteAddr(self):
         self.assertEqual((0, PAGESIZE), self.disk.pagenoToByteAddr(0))

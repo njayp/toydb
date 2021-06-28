@@ -3,16 +3,30 @@ from .frame import (FrameArray, Frame)
 
 
 
-class SequencialReplacer(FrameArray):
+class SequentialReplacer(FrameArray):
 
     def __init__(self):
         super().__init__()
 
-    def replacer(self, rawbytes: bytearray, pageno: int, pinned: bool=False, dirty: bool=False):
-        # TODO replace with for-else that throws exception
-        while (chosen := self.framearray.pop(0)).pinned:
-            self.framearray.append(chosen)
+
+    def replacer(self, frame: Frame):
+        for i in range(BUFFERSIZE):
+            if not (chosen := self.framearray.pop(0)).pinned:
+                break
+            else:
+                self.framearray.append(chosen)
+
+        else:
+            raise Exception("All buffer frames pinned")
         
-        self.framearray.append(Frame(rawbytes, pageno, pinned, dirty))
+        self.framearray.append(frame)
         return chosen
-        
+
+
+class FIFOReplacer(FrameArray):
+
+    def __init__(self):
+        super().__init__()
+
+    def replacer(self, frame: Frame):
+        pass

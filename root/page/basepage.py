@@ -1,4 +1,5 @@
 from ..globals import *
+from ..buffer.buffer import Frame
 import json
 
 PAGETYPESIZE = 1 # bytes
@@ -24,41 +25,32 @@ ENOCDE = 'big'
 
 class BasePage():
 
-    def __init__(self, pagetype: int=0, pageno: int=0, nextpage: int=0):
+    def __init__(self, frame: Frame):
         super().__init__()
-        self.rawbytes = bytearray(PAGESIZE)
-        self.rawbytes[:PAGETYPESIZE] = pagetype.to_bytes(PAGETYPESIZE, ENOCDE)
-        self.rawbytes[PAGETYPESIZE:PAGENOEND] = pageno.to_bytes(PAGENOSIZE, ENOCDE)
-        self.rawbytes[NEXTPAGESTART:NEXTPAGEEND] = nextpage.to_bytes(DATAMAXSIZE, ENOCDE)
-        self.rawbytes[DATAMAXSTART:DATAMAXEND] = DATAMAX.to_bytes(DATAMAXSIZE, ENOCDE)
-
-    # for testing
-    def setBytes(self, rawbytes):
-        self.rawbytes = rawbytes
-        return self
+        self.frame = frame
  
     def setData(self, rawbytes):
-        self.rawbytes[HEADERSIZE:] = rawbytes
+        self.frame.rawbytes[HEADERSIZE:] = rawbytes
 
     def getPageType(self):
-        return int.from_bytes(self.rawbytes[:PAGETYPESIZE], ENOCDE)
+        return int.from_bytes(self.frame.rawbytes[:PAGETYPESIZE], ENOCDE)
 
     def getPageNo(self):
-        return int.from_bytes(self.rawbytes[PAGETYPESIZE:PAGENOEND], ENOCDE)
+        return int.from_bytes(self.frame.rawbytes[PAGETYPESIZE:PAGENOEND], ENOCDE)
 
     def getDataMax(self):
-        return int.from_bytes(self.rawbytes[DATAMAXSTART:DATAMAXEND], ENOCDE)
+        return int.from_bytes(self.frame.rawbytes[DATAMAXSTART:DATAMAXEND], ENOCDE)
 
     def setNextPage(self, pageno: int):
-        self.rawbytes[NEXTPAGESTART:NEXTPAGEEND] = pageno.to_bytes(DATAMAXSIZE, ENOCDE)
+        self.frame.rawbytes[NEXTPAGESTART:NEXTPAGEEND] = pageno.to_bytes(DATAMAXSIZE, ENOCDE)
 
     def getNextPage(self):
-        return int.from_bytes(self.rawbytes[NEXTPAGESTART:NEXTPAGEEND], ENOCDE)
+        return int.from_bytes(self.frame.rawbytes[NEXTPAGESTART:NEXTPAGEEND], ENOCDE)
 
     def getData(self):
-        return self.rawbytes[HEADERSIZE:]
+        return self.frame.rawbytes[HEADERSIZE:]
 
     def getBytes(self):
-        return self.rawbytes
+        return self.frame.rawbytes
 
         
