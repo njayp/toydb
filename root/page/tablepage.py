@@ -1,5 +1,5 @@
 from .basepage import BasePage
-import json
+
 
 TABLEPAGETYPE = 2
 
@@ -9,9 +9,8 @@ class TablePage(BasePage):
         super().__init__(frame)
 
     def init_header(self):
-        super().initHeader()
+        super().init_header()
         self.setPageType(TABLEPAGETYPE)
         self.setPageNo(self.frame.pageno)
+        return self
 
-    def getRecords(self):
-        pass

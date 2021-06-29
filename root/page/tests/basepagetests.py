@@ -17,12 +17,12 @@ class BasePageTests(unittest.TestCase):
         pageno = 2
         nextpageno = 3
         datamax = 4
-        self.page.setData(data)
+        self.page.setDataBytes(data)
         self.page.setPageType(pagetype)
         self.page.setPageNo(pageno)
         self.page.setDataMax(datamax)
         self.page.setNextPage(nextpageno)
-        self.assertEqual(data, self.page.getData())
+        self.assertEqual(data, self.page.getDataBytes())
         self.assertEqual(pagetype, self.page.getPageType())
         self.assertEqual(pageno, self.page.getPageNo())
         self.assertEqual(nextpageno, self.page.getNextPage())

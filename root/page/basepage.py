@@ -26,12 +26,14 @@ R2SIZE = 3
 R2START = R1END
 R2END = R2START + R2SIZE
 
-HEADERSIZE = DATAMAXEND + RESERVED
+HEADERSIZE = R2END
 
 #####
 
 DATAMAX = PAGESIZE - HEADERSIZE
-ENOCDE = 'big'
+ENDIAN = 'big'
+ENCODE = 'utf-8'
+
 
 class BasePage():
 
@@ -39,50 +41,70 @@ class BasePage():
         super().__init__()
         self.frame = frame
 
-    def initHeader(self):
+    def init_header(self):
         self.setDataMax(DATAMAX)
         return self
 
-    def getData(self):
+    def getDataBytes(self):
         return self.frame.rawbytes[HEADERSIZE:]
  
-    def setData(self, rawbytes: bytearray):
+    def setDataBytes(self, rawbytes: bytearray):
+        self.frame.dirty = True
         self.frame.rawbytes[HEADERSIZE:] = rawbytes
 
+    def getHeaderAttr(self, start: int, end: int):
+        return int.from_bytes(self.frame.rawbytes[start:end], ENDIAN)
+
+    def setHeaderAttr(self, start: int, end: int, data: int, size: int):
+        self.frame.dirty = True
+        self.frame.rawbytes[start:end] = data.to_bytes(size, ENDIAN)
+
     def getPageType(self):
-        return int.from_bytes(self.frame.rawbytes[PAGETYPESTART:PAGETYPEEND], ENOCDE)
+        return self.getHeaderAttr(PAGETYPESTART, PAGETYPEEND)
 
     def setPageType(self, pagetype: int):
-        self.frame.rawbytes[PAGETYPESTART:PAGETYPEEND] = pagetype.to_bytes(PAGETYPESIZE, ENOCDE)
+        self.setHeaderAttr(PAGETYPESTART, PAGETYPEEND, pagetype, PAGETYPESIZE)
 
     def getPageNo(self):
-        return int.from_bytes(self.frame.rawbytes[PAGENOSTART:PAGENOEND], ENOCDE)
+        return self.getHeaderAttr(PAGENOSTART, PAGENOEND)
 
     def setPageNo(self, pageno: int):
-        self.frame.rawbytes[PAGENOSTART:PAGENOEND] = pageno.to_bytes(PAGENOSIZE, ENOCDE)
+        self.setHeaderAttr(PAGENOSTART, PAGENOEND, pageno, PAGENOSIZE)
 
     def getR1(self):
-        return int.from_bytes(self.frame.rawbytes[R1START:R1END], ENOCDE)
+        return self.getHeaderAttr(R1START, R1END)
 
     def setR1(self, pageno: int):
-        self.frame.rawbytes[R1START:R1END] = pageno.to_bytes(R1SIZE, ENOCDE)
+        self.setHeaderAttr(R1START, R1END, pageno, R1SIZE)
 
     def getR2(self):
-        return int.from_bytes(self.frame.rawbytes[R2START:R2END], ENOCDE)
+        return self.getHeaderAttr(R2START, R2END)
 
     def setR2(self, pageno: int):
-        self.frame.rawbytes[R2START:R2END] = pageno.to_bytes(R2SIZE, ENOCDE)
+        self.setHeaderAttr(R2START, R2END, pageno, R2SIZE)
 
     def getDataMax(self):
-        return int.from_bytes(self.frame.rawbytes[DATAMAXSTART:DATAMAXEND], ENOCDE)
+        return self.getHeaderAttr(DATAMAXSTART, DATAMAXEND)
 
     def setDataMax(self, nobytes: int):
-        self.frame.rawbytes[DATAMAXSTART:DATAMAXEND] = nobytes.to_bytes(DATAMAXSIZE, ENOCDE)
+        self.setHeaderAttr(DATAMAXSTART, DATAMAXEND, nobytes, DATAMAXSIZE)
 
     def getNextPage(self):
-        return int.from_bytes(self.frame.rawbytes[NEXTPAGESTART:NEXTPAGEEND], ENOCDE)
+        return self.getHeaderAttr(NEXTPAGESTART, NEXTPAGEEND)
 
     def setNextPage(self, pageno: int):
-        self.frame.rawbytes[NEXTPAGESTART:NEXTPAGEEND] = pageno.to_bytes(DATAMAXSIZE, ENOCDE)
+        self.setHeaderAttr(NEXTPAGESTART, NEXTPAGEEND, pageno, DATAMAXSIZE)
+
+    def getPageObj(self):
+        return json.loads(self.getDataBytes())
+
+    def trySetPageObj(self, page, obj):
+        rawbytes = bytearray(json.dumps(obj), ENCODE)
+        if len(rawbytes) > self.getDataMax():
+            return False
+        else:
+            self.setDataBytes(rawbytes)
+            return True
+
 
         

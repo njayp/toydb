@@ -1,6 +1,7 @@
 import mmap
 from ..globals import *
 import os
+#from ..page.headerpage import createBlankHeader
 
 class Disk():
     
@@ -12,7 +13,8 @@ class Disk():
             self.f = open(filename, "r+b")
         else:
             self.f = open(filename, "a+b")
-            self.f.write(bytearray(PAGESIZE*10)) # TODO replace w/ database header
+            #self.f.write(createBlankHeader().frame.rawbytes)
+            self.f.write(bytearray((PAGESIZE)*DISKSIZE))
             self.f.flush()
 
         self.disk = mmap.mmap(self.f.fileno(), 0)

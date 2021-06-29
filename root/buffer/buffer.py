@@ -21,11 +21,13 @@ class Buffer():
             self.evict(replacedframe)
             return frame
 
+    '''
     def returnFrame(self, frame: Frame):
         frame.dirty = True
         if self.manager.findFrame(frame.pageno) == None:
             replacedframe = self.manager.replacer(frame)
             self.evict(replacedframe)
+    '''
 
     def evict(self, frame: Frame):
         if frame.dirty:

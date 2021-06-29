@@ -3,8 +3,8 @@ import json
 from ..buffer.buffer import Buffer
 from ..storage.disk import Disk
 from ..page.headerpage import HeaderPage
+from ..page.tablepage import TablePage
 from ..page.datapage import DataPage
-from ..globals import *
 from types import SimpleNamespace
 
 HEADERPAGENO = 0
@@ -15,75 +15,80 @@ class HeapFile():
         super().__init__()
         self.disk = Disk(name)
         self.buffer = Buffer(disk)
+        self.headerpage = self.getPage(0, HeaderPage)
+        if self.headerpage.getPageType() == 0:
+            self.headerpage.init_header()
+
+    def getPage(self, pageno: int, pagetype):
+        frame = self.buffer.requestFrame(pageno)
+        return pagetype(frame)
 
     def addRecord(self, tablename: string, record: string):
-        headerpage, tables = self.getTables()
+        tabledict = self.headerpage.getPageObj()
 
-        if tablename in tables.keys():
-            pageno = tables[tablename][-1]
-
+        if tablename in tabledict.keys():
+            tablepageno = tabledict[tablename]
+            tablepage = self.getPage(tablepageno)
         else:
-            pageno = self.addTable(tablename)
+            tablepageno = self.getNextEmptyPage()
+            tabledict[tablename] = tablepageno
+            # TODO handle full headerpage
+            self.headerpage.trySetPageObj(tabledict)
+            tablepage = self.getPage(tablepageno, TablePage).init_header()
 
-        self.addRecordToPage(pageno)
+        pagearray = tablepage.getPageObj()
+        pageno = pagearray[-1]
+        page = self.getPage(pageno)
+        records = page.getPageObj(page)
+        records.append(record)
+        if not page.trySetPageObj(records):
+            newpageno = self.getNextEmptyPage()
+            page.setNextPage(newpageno)
+            pagearray.append(newpageno)
+            tablepage.trySetPageObj(pagearray)
+            # TODO handle full tablepage
+            newpage = self.getPage(newpageno, DataPage).init_header()
+            newpage.trySetPageObj([record])
+            newpage.frame.pinned = False
 
-    def addRecordToPage(self, pageno: int):
-        pass
-
-    def getReadTable(self):
-        pass
-
-    def addPageToTable(self, table: string, pageno: int):
-        headerpage, tables = self.getTables()
-
-        if table in tables.keys():
-            tables[table].append(pageno)
-
-        else:
-            table[table] = [pageno]
-
-        data = json.dumps(tables)
-        headerpage.setData(data)
-        self.buffer.writeFrame(headerpage.frame)
-        return pageno
-
-    def scanFromStartPage(self, startpage: int):
-        page, recordlist = self.getPageData(startpage, DataPage)
+        tablepage.frame.pinned = False
         page.frame.pinned = False
-        while (nextpage := page.getNextPage()) != 0:
-            page, nextlist = getPageData(nextpage, DataPage)
-            recordlist.extend(nextlist)
+
+    def readTable(self, tablename: string):
+        tabledict = self.headerpage.getPageObj()
+
+        if tablename in tabledict.keys():
+            tablepageno = tabledict[tablename]
+            tablepage = self.getPage(tablepageno)
+            firstpageno = tablepage.getPageObj()[0]
+            return self.scanRecords(firstpageno)
+        else:
+            return []
+
+
+    def scanRecords(self, startpageno: int):
+        
+        page = self.getPage(startpageno)
+        records = page.getPageObj()
+        page.frame.pinned = False
+
+        while (nextpageno := page.getNextPage()) != 0:
+            page = self.getPage(nextpageno)
+            records.append(page.getPageObj())
             page.frame.pinned = False
 
-        return recordlist
+        return records
+            
 
+    def getNextEmptyPage(self):
+        dbsize = self.headerpage.getDBSize()
 
-    def getPageData(self, pageno: int, pagetype):
-        frame = self.buffer.requestFrame(pageno, True)
-        page = pagetype(frame)
-        tables = json.loads(page.getData())
-        return (page, tables)
+        if dbsize == self.headerpage.getDBCap():
+            raise Exception("Disk is full")
 
-    def writePage(self, page):
-        pass
+        self.headerpage.setDBSize(dbsize + 1)
+        return dbsize
 
-    def getTables(self):
-        pass
-
-    def getTablePages(self):
-        pass
-
-    def appendRecord(self):
-        pass
-
-    def addDataPage(self):
-        pass
-
-    def addTablePage(self):
-        pass
-
-    def addHeaderPage(self):
-        pass
 
     def close(self):
         self.buffer.close()

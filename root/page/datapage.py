@@ -7,9 +7,7 @@ class DataPage(BasePage):
         super().__init__(frame)
 
     def init_header(self):
-        super().initHeader()
+        super().init_header()
         self.setPageType(DATAPAGETYPE)
         self.setPageNo(self.frame.pageno)
-
-    def getRecords(self):
-        pass
+        return self
