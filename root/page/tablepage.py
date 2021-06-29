@@ -1,6 +1,5 @@
 from .basepage import BasePage
 
-
 TABLEPAGETYPE = 2
 
 class TablePage(BasePage):
@@ -11,6 +10,5 @@ class TablePage(BasePage):
     def init_header(self):
         super().init_header()
         self.setPageType(TABLEPAGETYPE)
-        self.setPageNo(self.frame.pageno)
         return self
 

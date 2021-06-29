@@ -9,22 +9,18 @@ class BasePageTests(unittest.TestCase):
 
     def test_pagecreation(self):
         self.assertEqual(0, self.page.getPageType())
-        self.assertEqual(0, self.page.getPageNo())
 
     def test_setget(self):
         data = b'\1'*(PAGESIZE - HEADERSIZE)
         pagetype = 5
-        pageno = 2
         nextpageno = 3
         datamax = 4
         self.page.setDataBytes(data)
         self.page.setPageType(pagetype)
-        self.page.setPageNo(pageno)
         self.page.setDataMax(datamax)
         self.page.setNextPage(nextpageno)
         self.assertEqual(data, self.page.getDataBytes())
         self.assertEqual(pagetype, self.page.getPageType())
-        self.assertEqual(pageno, self.page.getPageNo())
         self.assertEqual(nextpageno, self.page.getNextPage())
         self.assertEqual(datamax, self.page.getDataMax())
 

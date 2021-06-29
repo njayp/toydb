@@ -28,18 +28,15 @@ class Disk():
     def close(self):
         self.disk.close()
         self.f.close()
-
-    def pagenoToByteAddr(self, pageno: int):
-        start = pageno * PAGESIZE
-        return (start, start + PAGESIZE)
         
     def readBytes(self, pageno):
-        start, stop = self.pagenoToByteAddr(pageno)
-        return self.disk[start:stop]
+        start = pageno * PAGESIZE
+        return bytearray(self.disk[start:start + PAGESIZE])
 
     def writeBytes(self, pageno, data):
-        start, stop = self.pagenoToByteAddr(pageno)
-        self.disk[start:stop] = data
+        start = pageno * PAGESIZE
+        size = len(data)
+        self.disk[start:start + size] = data
         #self.disk.flush()
 
     def setSize(self, nopages):

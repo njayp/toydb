@@ -1,4 +1,4 @@
 from .buffertests import BufferTests
-from .framedatatests import FrameDataTests
+from .frametests import FrameTests
 
-__all__ = ['BufferTests', 'FrameDataTests']
+__all__ = ['BufferTests', 'FrameTests']

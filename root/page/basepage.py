@@ -6,12 +6,8 @@ PAGETYPESIZE = 1 # bytes
 PAGETYPESTART = 0
 PAGETYPEEND = PAGETYPESIZE + PAGETYPESTART
 
-PAGENOSIZE = 3
-PAGENOSTART = PAGETYPESIZE
-PAGENOEND = PAGETYPESIZE + PAGENOSIZE
-
 NEXTPAGESIZE = 3
-NEXTPAGESTART = PAGENOEND
+NEXTPAGESTART = PAGETYPEEND
 NEXTPAGEEND = NEXTPAGESTART + NEXTPAGESIZE
 
 DATAMAXSIZE = 3
@@ -42,10 +38,12 @@ class BasePage():
         self.frame = frame
 
     def init_header(self):
+        #print(DATAMAX)
         self.setDataMax(DATAMAX)
         return self
 
     def getDataBytes(self):
+        #print(self.frame.rawbytes[HEADERSIZE:])
         return self.frame.rawbytes[HEADERSIZE:]
  
     def setDataBytes(self, rawbytes: bytearray):
@@ -57,6 +55,7 @@ class BasePage():
 
     def setHeaderAttr(self, start: int, end: int, data: int, size: int):
         self.frame.dirty = True
+        #print(self.frame.rawbytes[start:end])
         self.frame.rawbytes[start:end] = data.to_bytes(size, ENDIAN)
 
     def getPageType(self):
@@ -64,12 +63,6 @@ class BasePage():
 
     def setPageType(self, pagetype: int):
         self.setHeaderAttr(PAGETYPESTART, PAGETYPEEND, pagetype, PAGETYPESIZE)
-
-    def getPageNo(self):
-        return self.getHeaderAttr(PAGENOSTART, PAGENOEND)
-
-    def setPageNo(self, pageno: int):
-        self.setHeaderAttr(PAGENOSTART, PAGENOEND, pageno, PAGENOSIZE)
 
     def getR1(self):
         return self.getHeaderAttr(R1START, R1END)
@@ -96,9 +89,12 @@ class BasePage():
         self.setHeaderAttr(NEXTPAGESTART, NEXTPAGEEND, pageno, DATAMAXSIZE)
 
     def getPageObj(self):
-        return json.loads(self.getDataBytes())
+        if (rawbytes := self.getDataBytes()) == bytearray(PAGESIZE - HEADERSIZE):
+            # Header pages will never be empty
+            return []
+        return json.loads(rawbytes)
 
-    def trySetPageObj(self, page, obj):
+    def trySetPageObj(self, obj):
         rawbytes = bytearray(json.dumps(obj), ENCODE)
         if len(rawbytes) > self.getDataMax():
             return False

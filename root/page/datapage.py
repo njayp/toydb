@@ -9,5 +9,4 @@ class DataPage(BasePage):
     def init_header(self):
         super().init_header()
         self.setPageType(DATAPAGETYPE)
-        self.setPageNo(self.frame.pageno)
         return self

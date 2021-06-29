@@ -14,9 +14,9 @@ class HeaderPage(BasePage):
     def init_header(self):
         super().init_header()
         self.setPageType(HEADERPAGETYPE)
-        self.setPageNo(self.frame.pageno)
         self.setDBSize(1)
         self.setDBCap(DISKSIZE)
+        self.trySetPageObj({})
         return self
 
     def getDBSize(self):
@@ -30,16 +30,3 @@ class HeaderPage(BasePage):
 
     def setDBCap(self, size: int):
         return self.setR2(size)
-
-class table():
-
-    def __init__(self, name: string):
-        super().__init__()
-        self.name = name
-        self.pages = []
-
-'''
-def createBlankHeader():
-    frame = Frame(bytearray(PAGESIZE), 0, False, False)
-    return HeaderPage(frame).init_header()
-'''
