@@ -1,6 +1,15 @@
-from . import basepage
+from .basepage import BasePage
 
-class DataPage(basepage):
+DATAPAGETYPE = 3
+class DataPage(BasePage):
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, frame):
+        super().__init__(frame)
+
+    def init_header(self):
+        super().initHeader()
+        self.setPageType(DATAPAGETYPE)
+        self.setPageNo(self.frame.pageno)
+
+    def getRecords(self):
+        pass

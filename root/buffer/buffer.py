@@ -1,6 +1,6 @@
 from ..globals import *
 from .replacers import SequentialReplacer
-from .frame import (FrameArray, Frame)
+from .frame import Frame
 from ..storage.disk import Disk
 
 class Buffer():
@@ -10,32 +10,22 @@ class Buffer():
         self.manager = manager()
         self.disk = disk
 
-    def requestFrame(self, pageno: int, pinned: bool=False):
+    def requestFrame(self, pageno: int):
         if (frame := self.manager.findFrame(pageno)) != None:
-            frame.pinned = pinned
+            frame.pinned = True
             return frame
         else:
-            return self.loadBytes(pageno, pinned)
+            rawbytes = self.disk.readBytes(pageno)
+            frame = Frame(rawbytes, pageno, True, False)
+            replacedframe = self.manager.replacer(frame)
+            self.evict(replacedframe)
+            return frame
 
-    def loadBytes(self, pageno: int, pinned: bool=False):
-        rawbytes = self.disk.readBytes(pageno)
-        frame = Frame(rawbytes, pageno, pinned, False)
-        replacedframe = self.manager.replacer(frame)
-        self.evict(replacedframe)
-        return frame
-
-    def setPageBytes(self, rawbytes: bytearray, pageno: int, pinned: bool=False):
-        if (frame := self.manager.findFrame(pageno)) != None:
-            frame.dirty = True
-            frame.pinned = pinned
-            frame.rawbytes = rawbytes
-        else:
-            frame = Frame(rawbytes, pageno, pinned, True)
-            self.createPage(frame)
-
-    def createPage(self, frame: Frame):
-        replacedframe = self.manager.replacer(frame)
-        self.evict(replacedframe)
+    def returnFrame(self, frame: Frame):
+        frame.dirty = True
+        if self.manager.findFrame(frame.pageno) == None:
+            replacedframe = self.manager.replacer(frame)
+            self.evict(replacedframe)
 
     def evict(self, frame: Frame):
         if frame.dirty:

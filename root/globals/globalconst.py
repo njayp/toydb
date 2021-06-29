@@ -1,3 +1,2 @@
 PAGESIZE = 1024 # bytes
-TABLESIZE = 100 # pages
-BUFFERSIZE = 10
+BUFFERSIZE = 10 # frames

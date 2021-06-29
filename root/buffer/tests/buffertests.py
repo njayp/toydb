@@ -2,6 +2,7 @@ from ..buffer import Buffer
 from ..replacers import SequentialReplacer
 from ...globals import *
 from ...storage.disk import Disk
+from ..frame import Frame
 import unittest
 import os
 
@@ -22,27 +23,33 @@ class BufferTests(unittest.TestCase):
         os.remove(self.filename)
 
     def test_requestFrame(self):
-        self.assertEqual(self.buffer.requestFrame(0).rawbytes, self.pages[0])
-        self.assertEqual(self.buffer.requestFrame(50).rawbytes, self.pages[50])
+        frame = self.buffer.requestFrame(0)
+        self.assertEqual(frame.rawbytes, self.pages[0])
+        frame.pinned = False
 
     def test_pinned(self):
-        self.assertEqual(self.buffer.requestFrame(31, True).rawbytes, self.pages[31])
+        pageno = 31
+        frame = self.buffer.requestFrame(pageno)
+        self.assertEqual(frame.rawbytes, self.pages[pageno])
         for i in range(50, 100):
-            self.buffer.requestFrame(i)
+            self.buffer.requestFrame(i).pinned = False
         #print([fd.pageno for fd in self.buffer.replacer.fda])
-        self.assertNotEqual(self.buffer.manager.findFrame(31), None)
+        self.assertNotEqual(self.buffer.manager.findFrame(pageno), None)
 
     def test_writeFlushRead(self):
-        self.assertEqual(self.buffer.requestFrame(32).rawbytes, self.pages[32])
+        pageno = 42
+        frame = self.buffer.requestFrame(pageno)
+        self.assertEqual(frame.rawbytes, self.pages[pageno])
         newpage = self.pages[5]
-        self.buffer.setPageBytes(newpage, 32)
-        self.assertEqual(self.buffer.requestFrame(32).rawbytes, newpage)
-        self.assertEqual(self.buffer.manager.findFrame(32).rawbytes, newpage)
-        self.assertEqual(self.buffer.manager.findFrame(32).dirty, True)
+        frame.rawbytes = newpage
+        frame.pinned = False
+        self.buffer.returnFrame(frame)
+        self.assertEqual(self.buffer.manager.findFrame(pageno).rawbytes, newpage)
+        self.assertEqual(self.buffer.manager.findFrame(pageno).dirty, True)
         for i in range(50, 100):
-            self.buffer.requestFrame(i)
-        self.assertEqual(self.buffer.manager.findFrame(32), None)
-        self.assertEqual(self.buffer.requestFrame(32).rawbytes, newpage)
+            self.buffer.requestFrame(i).pinned = False
+        self.assertEqual(self.buffer.manager.findFrame(pageno), None)
+        self.assertEqual(self.buffer.requestFrame(pageno).rawbytes, newpage)
 
     
 

@@ -1,4 +1,3 @@
-from ..frame import FrameArray
 from ..replacers import SequentialReplacer
 from ...globals import *
 import unittest
