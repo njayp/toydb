@@ -2,12 +2,9 @@ from ..globals import *
 from ..buffer.buffer import Frame
 import json
 
-PAGETYPESIZE = 1 # bytes
-PAGETYPESTART = 0
-PAGETYPEEND = PAGETYPESIZE + PAGETYPESTART
 
 NEXTPAGESIZE = 3
-NEXTPAGESTART = PAGETYPEEND
+NEXTPAGESTART = 0
 NEXTPAGEEND = NEXTPAGESTART + NEXTPAGESIZE
 
 DATAMAXSIZE = 3
@@ -38,12 +35,10 @@ class BasePage():
         self.frame = frame
 
     def init_header(self):
-        #print(DATAMAX)
         self.setDataMax(DATAMAX)
         return self
 
     def getDataBytes(self):
-        #print(self.frame.rawbytes[HEADERSIZE:])
         return self.frame.rawbytes[HEADERSIZE:]
  
     def setDataBytes(self, rawbytes: bytearray):
@@ -55,14 +50,7 @@ class BasePage():
 
     def setHeaderAttr(self, start: int, end: int, data: int, size: int):
         self.frame.dirty = True
-        #print(self.frame.rawbytes[start:end])
         self.frame.rawbytes[start:end] = data.to_bytes(size, ENDIAN)
-
-    def getPageType(self):
-        return self.getHeaderAttr(PAGETYPESTART, PAGETYPEEND)
-
-    def setPageType(self, pagetype: int):
-        self.setHeaderAttr(PAGETYPESTART, PAGETYPEEND, pagetype, PAGETYPESIZE)
 
     def getR1(self):
         return self.getHeaderAttr(R1START, R1END)
@@ -89,17 +77,21 @@ class BasePage():
         self.setHeaderAttr(NEXTPAGESTART, NEXTPAGEEND, pageno, DATAMAXSIZE)
 
     def getPageObj(self):
-        if (rawbytes := self.getDataBytes()) == bytearray(PAGESIZE - HEADERSIZE):
+        if (databytes := self.getDataBytes()) == bytearray(PAGESIZE - HEADERSIZE):
             # Header pages will never be empty
             return []
-        return json.loads(rawbytes)
+
+        while databytes[-1] == 0:
+            databytes.pop()
+
+        return json.loads(databytes)
 
     def trySetPageObj(self, obj):
-        rawbytes = bytearray(json.dumps(obj), ENCODE)
-        if len(rawbytes) > self.getDataMax():
+        databytes = bytearray(json.dumps(obj), ENCODE)
+        if len(databytes) > self.getDataMax():
             return False
         else:
-            self.setDataBytes(rawbytes)
+            self.setDataBytes(databytes)
             return True
 
 

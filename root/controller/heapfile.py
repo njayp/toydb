@@ -18,7 +18,7 @@ class HeapFile():
         self.disk = Disk(name)
         self.buffer = Buffer(self.disk)
         self.headerpage = self.getPage(0, HeaderPage)
-        if self.headerpage.getPageType() == 0:
+        if self.headerpage.getDBCap() == 0:
             self.headerpage.init_header()
 
     def getPage(self, pageno: int, pagetype):

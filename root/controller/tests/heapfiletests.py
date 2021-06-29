@@ -1,4 +1,5 @@
 from ..heapfile import HeapFile
+from ...page.datapage import DataPage
 import os
 import unittest
 import io
@@ -20,9 +21,6 @@ class HeapFileTests(unittest.TestCase):
     def tearDown(self):
         self.hf.close()
         os.remove(self.filename)
-
-    def test_HFCreation(self):
-        self.assertEqual(self.hf.headerpage.getPageType(), 1)
 
     def test_readWrite(self):
         tablename = 'movie'
@@ -60,11 +58,13 @@ class HeapFileTests(unittest.TestCase):
         
     def test_pageSpilt(self):
         tablename = 'seagull'
-        records = ['mine']*1000
+        records = ['mine']*10000
         a = listToStreamOutput(records)
 
         for record in records:
             self.hf.addRecord(tablename, record)
+
+        #print(self.hf.getPage(2, DataPage))
 
         io1 = io.StringIO()
         self.hf.readTable(tablename, io1)
@@ -82,3 +82,34 @@ class HeapFileTests(unittest.TestCase):
 
         self.assertEqual(self.hf.searchTableForRecord(tablename, records[1]), True)
         self.assertEqual(self.hf.searchTableForRecord(tablename, 'star wars'), False)
+
+    def test_writeFlushRead(self):
+        tablename = 'movie'
+        records = ['rambo', 'iron man', 'silence of the lambs']
+
+        a = listToStreamOutput(records)
+
+        for record in records:
+            self.hf.addRecord(tablename, record)
+
+        for i in range(50, 100):
+            self.hf.getPage(i, DataPage).frame.pinned = False
+
+        io1 = io.StringIO()
+        self.hf.readTable(tablename, io1)
+        self.assertEqual(io1.getvalue(), a)
+
+    def test_closeOpen(self):
+        tablename = 'movie'
+        records = ['rambo', 'iron man', 'silence of the lambs']
+        a = listToStreamOutput(records)
+
+        for record in records:
+            self.hf.addRecord(tablename, record)
+
+        self.hf.close()
+        self.hf = HeapFile(self.filename)
+
+        io1 = io.StringIO()
+        self.hf.readTable(tablename, io1)
+        self.assertEqual(io1.getvalue(), a)

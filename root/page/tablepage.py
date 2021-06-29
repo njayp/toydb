@@ -9,6 +9,5 @@ class TablePage(BasePage):
 
     def init_header(self):
         super().init_header()
-        self.setPageType(TABLEPAGETYPE)
         return self
 

@@ -13,7 +13,6 @@ class HeaderPage(BasePage):
 
     def init_header(self):
         super().init_header()
-        self.setPageType(HEADERPAGETYPE)
         self.setDBSize(1)
         self.setDBCap(DISKSIZE)
         self.trySetPageObj({})
